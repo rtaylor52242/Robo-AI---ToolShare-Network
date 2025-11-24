@@ -1,0 +1,7 @@
+{
+  "name": "Robo AI - ToolShare Network",
+  "description": "A decentralized peer-to-peer platform for renting tools with AI-powered project matching.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
