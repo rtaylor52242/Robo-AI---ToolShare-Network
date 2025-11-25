@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Smartphone, ShieldCheck, ArrowRight, Github, Facebook, Chrome } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Mail, Lock, Smartphone, ShieldCheck, ArrowRight, Github, Facebook, Chrome, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/Button';
+import { useApp } from '../context/AppContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useApp();
   const [isLogin, setIsLogin] = useState(true);
   const [show2FA, setShow2FA] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [twoFacCode, setTwoFacCode] = useState('');
-
+  const [showPassword, setShowPassword] = useState(false);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin && !show2FA) {
@@ -18,12 +20,13 @@ const Login: React.FC = () => {
       setShow2FA(true);
     } else {
       // Complete Login/Register
-      navigate('/dashboard');
+      login(email || 'alex.rivera@example.com');
+      navigate('/');
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gray-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       
       {/* Background Decorative Elements */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-robo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -54,11 +57,11 @@ const Login: React.FC = () => {
                 </div>
                 <input
                   type="email"
-                  required
+                  required={isLogin} // Only require if logging in or standardize
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-robo-500 focus:border-transparent transition-all sm:text-sm"
-                  placeholder="Email address"
+                  placeholder="Email address (demo: any)"
                 />
               </div>
 
@@ -69,7 +72,6 @@ const Login: React.FC = () => {
                   </div>
                   <input
                     type="tel"
-                    required={!isLogin}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-robo-500 focus:border-transparent transition-all sm:text-sm"
                     placeholder="Phone number"
                   />
@@ -81,13 +83,20 @@ const Login: React.FC = () => {
                   <Lock size={18} className="text-gray-500" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-robo-500 focus:border-transparent transition-all sm:text-sm"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-robo-500 focus:border-transparent transition-all sm:text-sm"
                   placeholder="Password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-white"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
           )}

@@ -1,21 +1,24 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, ShieldCheck, ArrowLeft, CheckCircle, Flag, MoreVertical, Ban, Info, AlertTriangle, Zap, Activity } from 'lucide-react';
+import { MapPin, Star, ShieldCheck, ArrowLeft, CheckCircle, Flag, MoreVertical, Ban, Info, AlertTriangle, Zap, Activity, DollarSign, Share2 } from 'lucide-react';
 import { MOCK_TOOLS } from '../constants';
 import Button from '../components/Button';
 import ReportModal from '../components/ReportModal';
 import AvailabilityCalendar from '../components/AvailabilityCalendar';
 import MaintenanceLog from '../components/MaintenanceLog';
+import ReviewCard from '../components/ReviewCard';
+import ShareModal from '../components/ShareModal';
 
 const ToolDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const tool = MOCK_TOOLS.find(t => t.id === id);
-  const [bookingStatus, setBookingStatus] = useState<'idle' | 'success' | 'pending'>('idle');
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState<'tool' | 'user'>('tool');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   if (!tool) {
     return (
@@ -26,16 +29,8 @@ const ToolDetail: React.FC = () => {
     );
   }
 
-  const handleRent = () => {
-    // If Instant Booking is enabled, confirm immediately. Otherwise, send request.
-    const status = tool.instantBooking ? 'success' : 'pending';
-    setBookingStatus(status);
-    
-    // Reset after animation
-    setTimeout(() => {
-        // In a real app, this would redirect to a confirmation or chat page
-        // setBookingStatus('idle'); 
-    }, 5000);
+  const handleBookClick = () => {
+    navigate(`/checkout/${tool.id}`);
   };
 
   const handleReport = (type: 'tool' | 'user') => {
@@ -79,6 +74,12 @@ const ToolDetail: React.FC = () => {
                          </div>
                        )}
                    </div>
+                   <button 
+                      onClick={() => setShareModalOpen(true)}
+                      className="absolute top-4 left-4 bg-gray-900/50 backdrop-blur text-white p-2 rounded-full hover:bg-gray-900 transition-colors border border-gray-700"
+                   >
+                      <Share2 size={18} />
+                   </button>
                 </div>
                 
                 <div className="p-8">
@@ -108,6 +109,10 @@ const ToolDetail: React.FC = () => {
                            <div className="flex items-center gap-1">
                               <MapPin size={16} className="text-robo-500" />
                               {tool.location}
+                           </div>
+                           <div className="flex items-center gap-1 text-blue-400">
+                              <ShieldCheck size={16} />
+                              <span className="text-xs font-medium">Insured</span>
                            </div>
                         </div>
                      </div>
@@ -176,6 +181,17 @@ const ToolDetail: React.FC = () => {
                               </p>
                            </div>
                         )}
+                        
+                        {/* Reviews Section */}
+                        <div>
+                           <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Reviews</h3>
+                           <div className="space-y-4">
+                              <ReviewCard review={{
+                                 id: 'r1', authorName: 'John Doe', authorAvatar: '', rating: 5, text: 'Great tool!', date: '2023-10-10', verified: true, helpfulCount: 2
+                              }} />
+                           </div>
+                           <Button variant="ghost" fullWidth className="mt-2 text-sm text-robo-500">View All Reviews</Button>
+                        </div>
                      </div>
                   ) : (
                      <div className="animate-in fade-in duration-300">
@@ -203,7 +219,7 @@ const ToolDetail: React.FC = () => {
                    {tool.pricing && (
                      <div className="text-right text-xs text-gray-500">
                         <div>${tool.pricing.weekly} / week</div>
-                        <div className="text-green-500 font-medium">Save 15%+</div>
+                        <div className="text-green-500 font-medium">Save on long term</div>
                      </div>
                    )}
                 </div>
@@ -211,39 +227,31 @@ const ToolDetail: React.FC = () => {
                 <div className="mb-6">
                    <AvailabilityCalendar unavailableDates={tool.unavailableDates} />
                 </div>
+                
+                {tool.securityDeposit && (
+                  <div className="mb-6 p-3 bg-gray-800/50 rounded-lg flex items-center gap-3 border border-gray-700">
+                    <ShieldCheck className="text-green-500" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase font-bold">Security Deposit</p>
+                      <p className="text-white font-medium text-sm">${tool.securityDeposit} (Refundable)</p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-3">
-                   {bookingStatus === 'success' ? (
-                      <div className="bg-green-500/20 border border-green-500/50 text-green-400 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center animate-in zoom-in">
-                        <CheckCircle size={32} />
-                        <div>
-                           <p className="font-bold">Booking Confirmed!</p>
-                           <p className="text-xs mt-1">Check your dashboard for pickup instructions.</p>
-                        </div>
-                      </div>
-                   ) : bookingStatus === 'pending' ? (
-                      <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center animate-in zoom-in">
-                        <Activity size={32} />
-                        <div>
-                           <p className="font-bold">Request Sent</p>
-                           <p className="text-xs mt-1">Waiting for lender approval.</p>
-                        </div>
-                      </div>
-                   ) : (
-                      <Button 
-                         variant="primary" 
-                         fullWidth 
-                         size="lg" 
-                         onClick={handleRent}
-                         disabled={!tool.available}
-                         className={tool.instantBooking ? 'bg-gradient-to-r from-robo-500 to-robo-400' : ''}
-                      >
-                         {tool.available 
-                            ? (tool.instantBooking ? <><Zap size={18} className="mr-2 fill-white" /> Book Instantly</> : 'Request to Book') 
-                            : 'Join Waitlist'
-                         }
-                      </Button>
-                   )}
+                   <Button 
+                      variant="primary" 
+                      fullWidth 
+                      size="lg" 
+                      onClick={handleBookClick}
+                      disabled={!tool.available}
+                      className={tool.instantBooking ? 'bg-gradient-to-r from-robo-500 to-robo-400' : ''}
+                   >
+                      {tool.available 
+                         ? (tool.instantBooking ? <><Zap size={18} className="mr-2 fill-white" /> Book Instantly</> : 'Request to Book') 
+                         : 'Join Waitlist'
+                      }
+                   </Button>
                    <p className="text-center text-xs text-gray-500">
                      {tool.instantBooking ? 'No approval required. Instant confirmation.' : "You won't be charged until the lender accepts."}
                    </p>
@@ -279,7 +287,16 @@ const ToolDetail: React.FC = () => {
                          <ShieldCheck size={12} className="text-green-500" />
                          <span>Verified Owner</span>
                        </div>
-                       <p className="text-xs text-gray-500 mt-1">Response rate: 98%</p>
+                       <div className="flex gap-3 text-xs text-gray-500 mt-2">
+                          <div>
+                             <span className="text-white font-bold block">98%</span>
+                             Response
+                          </div>
+                          <div>
+                             <span className="text-white font-bold block">100%</span>
+                             Completion
+                          </div>
+                       </div>
                      </div>
                    </div>
                    
@@ -296,6 +313,13 @@ const ToolDetail: React.FC = () => {
         onClose={() => setReportModalOpen(false)}
         targetName={reportTarget === 'tool' ? tool.name : tool.lenderName}
         targetType={reportTarget}
+      />
+      
+      <ShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title={tool.name}
+        url={window.location.href}
       />
     </div>
   );

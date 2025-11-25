@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Image as ImageIcon, Trash2, Copy, Zap, Info, ShieldCheck } from 'lucide-react';
 import Button from '../components/Button';
-import { ToolCategory, ToolCondition } from '../types';
+import { ToolCategory, ToolCondition, Tool } from '../types';
 import { MOCK_SPEC_DATABASE } from '../constants';
+import { useApp } from '../context/AppContext';
 
 interface ListingItem {
   id: number;
@@ -25,6 +26,7 @@ interface ListingItem {
 
 const ListTool: React.FC = () => {
   const navigate = useNavigate();
+  const { addTool, user } = useApp();
   const [mode, setMode] = useState<'single' | 'bulk'>('single');
   const [items, setItems] = useState<ListingItem[]>([
     { 
@@ -107,10 +109,52 @@ const ListTool: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
+    
+    // Process items and add to global state
+    items.forEach(item => {
+      // Validate required fields roughly for demo
+      if (!item.name || !item.price || !item.category) return;
+
+      const newTool: Tool = {
+        id: `t_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        name: item.name,
+        description: item.description,
+        category: item.category as ToolCategory,
+        pricePerDay: parseFloat(item.price),
+        // Calculate mock pricing tiers
+        pricing: {
+          hourly: Math.round(parseFloat(item.price) / 4),
+          daily: parseFloat(item.price),
+          weekly: parseFloat(item.price) * 5,
+          monthly: parseFloat(item.price) * 15
+        },
+        // Mock image for demo
+        image: `https://picsum.photos/seed/${item.id}/400/300`,
+        available: true,
+        lenderName: user?.name || 'You',
+        rating: 0,
+        location: user?.location || 'Unknown',
+        condition: item.condition as ToolCondition,
+        instantBooking: item.instantBooking,
+        specs: {
+          brand: item.specs.brand,
+          model: item.specs.model,
+          powerSource: item.specs.powerSource as any,
+          voltage: item.specs.voltage
+        },
+        safetyGuidelines: item.safetyGuidelines,
+        maintenanceHistory: []
+      };
+
+      addTool(newTool);
+    });
+
+    // Simulate API delay
     setTimeout(() => {
+      setIsSubmitting(false);
+      // Redirect to Dashboard
       navigate('/dashboard');
-    }, 1500);
+    }, 1000);
   };
 
   return (

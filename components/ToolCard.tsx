@@ -12,18 +12,18 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="group relative bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-robo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-robo-500/10 flex flex-col h-full">
+    <div className="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden hover:border-robo-500/50 dark:hover:border-robo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-robo-500/10 flex flex-col h-full">
       <div className="relative h-48 overflow-hidden">
         <img 
           src={tool.image} 
           alt={tool.name} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-white border border-gray-700">
+        <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
           ${tool.pricePerDay}/day
         </div>
         {!tool.available && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/60 dark:bg-black/60 flex items-center justify-center">
             <span className="bg-red-500 text-white px-3 py-1 rounded-md font-bold text-sm rotate-12">RENTED</span>
           </div>
         )}
@@ -31,10 +31,10 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
       
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-bold text-white line-clamp-1 font-display">{tool.name}</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 font-display">{tool.name}</h3>
         </div>
         
-        <p className="text-gray-400 text-sm line-clamp-2 mb-4 flex-grow">
+        <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-grow">
           {tool.description}
         </p>
         
@@ -57,7 +57,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
           variant="secondary" 
           fullWidth 
           onClick={() => navigate(`/tool/${tool.id}`)}
-          className="group-hover:bg-robo-500 group-hover:text-white group-hover:border-robo-500 transition-colors"
+          className="group-hover:bg-robo-500 group-hover:text-white group-hover:border-robo-500 transition-colors dark:border-gray-700"
         >
           View Details
         </Button>
