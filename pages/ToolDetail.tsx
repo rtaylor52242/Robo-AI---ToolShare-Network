@@ -33,6 +33,11 @@ const ToolDetail: React.FC = () => {
     navigate(`/checkout/${tool.id}`);
   };
 
+  const handleMessageLender = () => {
+    // In a real app, this would create a conversation ID and pass it
+    navigate('/messages');
+  };
+
   const handleReport = (type: 'tool' | 'user') => {
     setReportTarget(type);
     setReportModalOpen(true);
@@ -300,7 +305,15 @@ const ToolDetail: React.FC = () => {
                      </div>
                    </div>
                    
-                   <Button variant="secondary" fullWidth size="sm" className="mt-4">Message Lender</Button>
+                   <Button 
+                      variant="secondary" 
+                      fullWidth 
+                      size="sm" 
+                      className="mt-4"
+                      onClick={handleMessageLender}
+                   >
+                      Message Lender
+                   </Button>
                 </div>
              </div>
           </div>

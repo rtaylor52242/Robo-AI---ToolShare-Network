@@ -110,32 +110,13 @@ const OnboardingTour: React.FC = () => {
   const step = steps[currentStep];
   const isTargeted = targetRect !== null;
 
-  // Calculate tooltip position
-  let tooltipStyle: React.CSSProperties = {};
-  if (isTargeted && targetRect) {
-    const spacing = 16;
-    switch (step.position) {
-      case 'bottom':
-        tooltipStyle = { top: targetRect.bottom + spacing, left: targetRect.left + targetRect.width / 2, transform: 'translateX(-50%)' };
-        break;
-      case 'top':
-        tooltipStyle = { top: targetRect.top - spacing, left: targetRect.left + targetRect.width / 2, transform: 'translate(-50%, -100%)' };
-        break;
-      case 'left':
-        tooltipStyle = { top: targetRect.top + targetRect.height / 2, right: window.innerWidth - targetRect.left + spacing, transform: 'translateY(-50%)' };
-        break;
-      case 'right':
-        tooltipStyle = { top: targetRect.top + targetRect.height / 2, left: targetRect.right + spacing, transform: 'translateY(-50%)' };
-        break;
-      default:
-        tooltipStyle = { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-    }
-  } else {
-    tooltipStyle = { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' };
-  }
-
-  // Ensure tooltip stays on screen roughly
-  // (In a real production app, use floating-ui or similar lib)
+  // Fixed Position Style (Center Screen) to prevent movement
+  const tooltipStyle: React.CSSProperties = { 
+    top: '50%', 
+    left: '50%', 
+    transform: 'translate(-50%, -50%)', 
+    position: 'fixed' 
+  };
 
   return (
     <div className="fixed inset-0 z-[60] pointer-events-none">

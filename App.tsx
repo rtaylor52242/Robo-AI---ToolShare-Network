@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
@@ -18,6 +19,7 @@ import Dispute from './pages/Dispute';
 import Rewards from './pages/Rewards';
 import Analytics from './pages/Analytics';
 import Community from './pages/Community';
+import UserManagement from './pages/UserManagement';
 
 // Wrapper component to handle auth routing logic
 const AppContent: React.FC = () => {
@@ -47,6 +49,7 @@ const AppContent: React.FC = () => {
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/community" element={<Community />} />
+              <Route path="/users" element={<UserManagement />} />
             </>
           ) : (
             // Redirect any other route to login if not authenticated

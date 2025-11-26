@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Smartphone, ShieldCheck, ArrowRight, Github, Facebook, Chrome, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/Button';
@@ -13,6 +14,17 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
+  // 2FA State and Refs
+  const [twoFactorCode, setTwoFactorCode] = useState(['', '', '', '', '', '']);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Auto-focus first input when 2FA is shown
+  useEffect(() => {
+    if (show2FA) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [show2FA]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin && !show2FA) {
@@ -20,8 +32,32 @@ const Login: React.FC = () => {
       setShow2FA(true);
     } else {
       // Complete Login/Register
+      // Use entered email or default to verified demo user if empty
       login(email || 'alex.rivera@example.com');
       navigate('/');
+    }
+  };
+
+  const handleTwoFactorChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const value = e.target.value;
+    
+    // Allow numbers only
+    if (!/^\d*$/.test(value)) return;
+
+    const newCode = [...twoFactorCode];
+    // Take the last character if user somehow pastes or types multiple
+    newCode[index] = value.substring(value.length - 1);
+    setTwoFactorCode(newCode);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Backspace' && !twoFactorCode[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -61,7 +97,7 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-robo-500 focus:border-transparent transition-all sm:text-sm"
-                  placeholder="Email address (demo: any)"
+                  placeholder="Email address (e.g., admin1@toolshare.com)"
                 />
               </div>
 
@@ -104,11 +140,15 @@ const Login: React.FC = () => {
           {show2FA && (
             <div className="space-y-4">
                <div className="flex gap-2 justify-center">
-                  {[1, 2, 3, 4, 5, 6].map((_, i) => (
+                  {twoFactorCode.map((digit, i) => (
                     <input 
                       key={i}
+                      ref={(el) => (inputRefs.current[i] = el)}
                       type="text" 
                       maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleTwoFactorChange(e, i)}
+                      onKeyDown={(e) => handleKeyDown(e, i)}
                       className="w-10 h-12 text-center text-xl font-bold bg-gray-800 border border-gray-700 rounded-lg focus:border-robo-500 focus:ring-1 focus:ring-robo-500 outline-none text-white transition-all"
                     />
                   ))}
@@ -125,7 +165,10 @@ const Login: React.FC = () => {
             <div className="text-center">
                <button 
                  type="button" 
-                 onClick={() => setShow2FA(false)} 
+                 onClick={() => {
+                   setShow2FA(false);
+                   setTwoFactorCode(['', '', '', '', '', '']); // Reset code when going back
+                 }} 
                  className="text-sm text-gray-400 hover:text-white"
                >
                  Back to Login
@@ -146,15 +189,15 @@ const Login: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <button className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
+              <a href="https://google.com" title="https://google.com" className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
                 <Chrome size={20} className="text-white" />
-              </button>
-              <button className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
+              </a>
+              <a href="https://facebook.com" title="https://facebook.com" className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
                 <Facebook size={20} className="text-blue-500" />
-              </button>
-               <button className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
+              </a>
+               <a href="https://github.com" title="https://github.com" className="flex justify-center items-center py-2.5 px-4 border border-gray-700 rounded-xl bg-gray-800 hover:bg-gray-700 transition-colors">
                 <Github size={20} className="text-white" />
-              </button>
+              </a>
             </div>
 
             <div className="text-center mt-4">

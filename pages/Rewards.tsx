@@ -12,6 +12,28 @@ const Rewards: React.FC = () => {
   const pointsToNext = nextTier ? nextTier.minPoints - currentPoints : 0;
   const progress = nextTier ? (currentPoints / nextTier.minPoints) * 100 : 100;
 
+  const handleInvite = () => {
+    const subject = encodeURIComponent("Join me on ToolShare - The Peer-to-Peer Tool Rental Network");
+    const body = encodeURIComponent(`Hey! 
+
+I've been using ToolShare to rent tools for my DIY projects and earn money from my own gear. It's awesome!
+
+Sign up using my referral code below and we both get $10 in rental credits.
+
+Referral Code: ${MOCK_USER.referralCode}
+
+Check it out here: https://toolshare-demo.app
+
+Cheers!`);
+    
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(MOCK_USER.referralCode);
+    alert("Referral code copied to clipboard!");
+  };
+
   return (
     <div className="min-h-screen bg-gray-950 py-12 px-4 sm:px-6 lg:px-8">
        <div className="max-w-5xl mx-auto">
@@ -119,12 +141,16 @@ const Rewards: React.FC = () => {
                    
                    <div className="bg-gray-950 rounded-lg p-3 border border-gray-700 flex justify-between items-center mb-4">
                       <code className="text-robo-500 font-bold font-mono text-lg">{MOCK_USER.referralCode}</code>
-                      <button className="text-gray-400 hover:text-white p-2">
+                      <button 
+                        onClick={handleCopyCode} 
+                        className="text-gray-400 hover:text-white p-2"
+                        title="Copy Code"
+                      >
                          <Copy size={16} />
                       </button>
                    </div>
                    
-                   <Button fullWidth className="mb-4">Invite Friends</Button>
+                   <Button fullWidth className="mb-4" onClick={handleInvite}>Invite Friends</Button>
                    <p className="text-xs text-center text-gray-500">Terms and conditions apply.</p>
                 </div>
 

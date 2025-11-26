@@ -112,6 +112,10 @@ export interface User {
   loyaltyPoints: number;
   referralCode: string;
   tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
+  
+  // Management Fields
+  role?: 'User' | 'Admin';
+  status?: 'Active' | 'Suspended';
 }
 
 export interface ActivityLog {
@@ -199,6 +203,16 @@ export interface Review {
   helpfulCount: number;
 }
 
+export interface ThreadReply {
+  id: string;
+  threadId: string;
+  author: string;
+  avatar: string;
+  content: string;
+  timestamp: number;
+  role?: string;
+}
+
 export interface ForumThread {
   id: string;
   title: string;
@@ -207,6 +221,8 @@ export interface ForumThread {
   replies: number;
   views: number;
   lastActive: string;
+  content?: string;
+  replyList?: ThreadReply[];
 }
 
 // Insurance & Marketing
@@ -239,4 +255,16 @@ export interface AnalyticsData {
   rentals: { date: string; value: number }[];
   views: { date: string; value: number }[];
   topTools: { name: string; rentals: number }[];
+}
+
+export interface ColorTheme {
+  id: string;
+  name: string;
+  colors: {
+    50: string;
+    100: string;
+    500: string;
+    600: string;
+    900: string;
+  };
 }

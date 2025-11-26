@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, MoreVertical, Phone, Video, Info, Send, Image as ImageIcon, Mic, Smile, X, MicOff, VideoOff, MonitorUp, MessageSquare, Download, Trash2, Share2, Paperclip, Mail, MailOpen } from 'lucide-react';
-import { MOCK_CONVERSATIONS } from '../constants';
-import { Conversation, Message } from '../types';
+import { Message } from '../types';
 import Button from '../components/Button';
+import { useApp } from '../context/AppContext';
 
 const Messages: React.FC = () => {
-  const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
-  const [activeConversationId, setActiveConversationId] = useState<string>(MOCK_CONVERSATIONS[0].id);
+  const { conversations, user, sendMessage } = useApp();
+  const [activeConversationId, setActiveConversationId] = useState<string>(conversations[0]?.id);
   const [inputText, setInputText] = useState('');
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -19,6 +19,12 @@ const Messages: React.FC = () => {
   const activeConversation = conversations.find(c => c.id === activeConversationId);
 
   useEffect(() => {
+    if (activeConversationId === undefined && conversations.length > 0) {
+      setActiveConversationId(conversations[0].id);
+    }
+  }, [conversations, activeConversationId]);
+
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -27,23 +33,24 @@ const Messages: React.FC = () => {
   // Click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Logic could be added here to close emoji picker/dropdown if clicked outside
+      const target = event.target as HTMLElement;
+      if (showActionsDropdown && !target.closest('#chat-actions-menu') && !target.closest('#chat-actions-toggle')) {
+        setShowActionsDropdown(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [showActionsDropdown]);
 
   const handleConversationClick = (id: string) => {
     setActiveConversationId(id);
-    // Mark as read when clicking
-    setConversations(prev => prev.map(c => 
-       c.id === id ? { ...c, unreadCount: 0 } : c
-    ));
+    // In a real app, we'd mark as read here via an API
+    setShowActionsDropdown(false);
   };
 
   const handleSendMessage = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !activeConversationId) return;
 
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -53,14 +60,14 @@ const Messages: React.FC = () => {
       type: 'text'
     };
 
-    updateConversation(newMessage);
+    sendMessage(activeConversationId, newMessage);
     setInputText('');
     setShowEmojiPicker(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !activeConversationId) return;
 
     // Create a fake object URL for preview purposes
     const imageUrl = URL.createObjectURL(file);
@@ -74,24 +81,10 @@ const Messages: React.FC = () => {
       type: 'image'
     };
 
-    updateConversation(newMessage);
+    sendMessage(activeConversationId, newMessage);
     
     // Reset input
     if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const updateConversation = (newMessage: Message) => {
-    setConversations(prev => prev.map(c => {
-      if (c.id === activeConversationId) {
-        return {
-          ...c,
-          messages: [...c.messages, newMessage],
-          lastMessage: newMessage.type === 'image' ? 'Sent an image' : newMessage.text,
-          lastMessageTimestamp: Date.now()
-        };
-      }
-      return c;
-    }));
   };
 
   const handleAddEmoji = (emoji: string) => {
@@ -121,34 +114,16 @@ const Messages: React.FC = () => {
 
   const handleClearChat = () => {
     if (!activeConversation) return;
-    if (window.confirm("Are you sure you want to clear this conversation history?")) {
-      setConversations(prev => prev.map(c => {
-        if (c.id === activeConversationId) {
-          return { ...c, messages: [] };
-        }
-        return c;
-      }));
+    if (window.confirm("Are you sure you want to clear this conversation history? This action cannot be undone.")) {
+      // In real app, call API to clear
+      alert('Chat cleared (simulated)');
     }
     setShowActionsDropdown(false);
   };
 
   const handleShareChat = () => {
-    // In a real app, this might generate a shared link
     navigator.clipboard.writeText(window.location.href);
     alert("Link to chat copied to clipboard!");
-    setShowActionsDropdown(false);
-  };
-
-  const handleToggleReadStatus = () => {
-    if (!activeConversation) return;
-    
-    setConversations(prev => prev.map(c => {
-       if (c.id === activeConversationId) {
-          // Toggle: If currently 0 unread, make it 1 to mark as "unread". If >0, make it 0 to mark "read".
-          return { ...c, unreadCount: c.unreadCount === 0 ? 1 : 0 };
-       }
-       return c;
-    }));
     setShowActionsDropdown(false);
   };
 
@@ -304,28 +279,20 @@ const Messages: React.FC = () => {
                 </button>
                 <div className="h-6 w-px bg-gray-800 mx-1"></div>
                 <button 
+                  id="chat-actions-toggle"
                   onClick={() => setShowActionsDropdown(!showActionsDropdown)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors"
+                  className={`p-2 hover:text-white hover:bg-gray-800 rounded-full transition-colors ${showActionsDropdown ? 'text-white bg-gray-800' : 'text-gray-400'}`}
                 >
                   <MoreVertical size={20} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {showActionsDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-20 overflow-hidden">
+                  <div id="chat-actions-menu" className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     <button 
-                      onClick={handleToggleReadStatus}
                       className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white flex items-center gap-2"
                     >
-                      {activeConversation.unreadCount > 0 ? (
-                         <>
-                            <MailOpen size={16} /> Mark as Read
-                         </>
-                      ) : (
-                         <>
-                            <Mail size={16} /> Mark as Unread
-                         </>
-                      )}
+                      <Mail size={16} /> Mark as Unread
                     </button>
                     <button 
                       onClick={handleDownloadChat}
@@ -342,9 +309,9 @@ const Messages: React.FC = () => {
                     <div className="border-t border-gray-800"></div>
                     <button 
                       onClick={handleClearChat}
-                      className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-gray-800 hover:text-red-300 flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-900/10 hover:text-red-300 flex items-center gap-2"
                     >
-                      <Trash2 size={16} /> Clear History
+                      <Trash2 size={16} /> Clear Chat History
                     </button>
                   </div>
                 )}
@@ -353,39 +320,47 @@ const Messages: React.FC = () => {
 
             {/* Messages List */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              <div className="text-center text-xs text-gray-500 my-4">
-                <span>Rental booked for May 15 - May 17</span>
-              </div>
-              {activeConversation.messages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}>
-                   {msg.senderId !== 'me' && (
-                     <img src={activeConversation.participantAvatar} className="w-8 h-8 rounded-full mr-2 self-end mb-1" alt="" />
-                   )}
-                   <div className={`max-w-[70%] group relative ${msg.senderId === 'me' ? 'items-end' : 'items-start'}`}>
-                     <div 
-                       className={`rounded-2xl overflow-hidden ${
-                         msg.senderId === 'me' 
-                           ? 'bg-robo-600 text-white rounded-br-none' 
-                           : 'bg-gray-800 text-gray-200 rounded-bl-none border border-gray-700'
-                       }`}
-                     >
-                       {msg.type === 'image' && msg.imageUrl ? (
-                         <div className="relative">
-                            <img src={msg.imageUrl} alt="Attachment" className="max-w-full sm:max-w-sm rounded-lg" />
-                         </div>
-                       ) : (
-                         <div className="px-4 py-2.5 text-sm">
-                           {msg.text}
-                         </div>
-                       )}
-                     </div>
-                     <span className={`text-[10px] text-gray-500 mt-1 block ${msg.senderId === 'me' ? 'text-right' : 'text-left'}`}>
-                       {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                     </span>
-                   </div>
+              {activeConversation.messages.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-gray-500 italic">
+                  No messages in this conversation.
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
+              ) : (
+                <>
+                  <div className="text-center text-xs text-gray-500 my-4">
+                    <span>Today</span>
+                  </div>
+                  {activeConversation.messages.map((msg) => (
+                    <div key={msg.id} className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}>
+                      {msg.senderId !== 'me' && (
+                        <img src={activeConversation.participantAvatar} className="w-8 h-8 rounded-full mr-2 self-end mb-1" alt="" />
+                      )}
+                      <div className={`max-w-[70%] group relative ${msg.senderId === 'me' ? 'items-end' : 'items-start'}`}>
+                        <div 
+                          className={`rounded-2xl overflow-hidden ${
+                            msg.senderId === 'me' 
+                              ? 'bg-robo-600 text-white rounded-br-none' 
+                              : 'bg-gray-800 text-gray-200 rounded-bl-none border border-gray-700'
+                          }`}
+                        >
+                          {msg.type === 'image' && msg.imageUrl ? (
+                            <div className="relative">
+                                <img src={msg.imageUrl} alt="Attachment" className="max-w-full sm:max-w-sm rounded-lg" />
+                            </div>
+                          ) : (
+                            <div className="px-4 py-2.5 text-sm">
+                              {msg.text}
+                            </div>
+                          )}
+                        </div>
+                        <span className={`text-[10px] text-gray-500 mt-1 block ${msg.senderId === 'me' ? 'text-right' : 'text-left'}`}>
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Input Area */}

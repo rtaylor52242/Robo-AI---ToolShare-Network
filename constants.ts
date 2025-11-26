@@ -1,5 +1,5 @@
 
-import { Tool, ToolCategory, Booking, User, ActivityLog, ToolCondition, Wallet, Notification, Conversation, FAQItem, Review, ForumThread, InsurancePlan, PromoCode, AnalyticsData, LoyaltyTier } from './types';
+import { Tool, ToolCategory, Booking, User, ActivityLog, ToolCondition, Wallet, Notification, Conversation, FAQItem, Review, ForumThread, InsurancePlan, PromoCode, AnalyticsData, LoyaltyTier, ColorTheme } from './types';
 
 export const MOCK_TOOLS: Tool[] = [
   {
@@ -14,7 +14,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Alex R.',
     rating: 4.8,
-    location: 'Downtown',
+    location: 'San Francisco, CA',
     condition: ToolCondition.GOOD,
     instantBooking: true,
     specs: {
@@ -42,7 +42,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Sarah J.',
     rating: 4.9,
-    location: 'Westside',
+    location: 'Seattle, WA',
     condition: ToolCondition.LIKE_NEW,
     instantBooking: false,
     specs: {
@@ -69,7 +69,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Mike T.',
     rating: 4.5,
-    location: 'North Hills',
+    location: 'Austin, TX',
     condition: ToolCondition.FAIR,
     instantBooking: true,
     specs: {
@@ -92,7 +92,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'AutoFix Garage',
     rating: 5.0,
-    location: 'Industrial Park',
+    location: 'Detroit, MI',
     condition: ToolCondition.NEW,
     instantBooking: false,
     maintenanceHistory: [
@@ -111,7 +111,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: false,
     lenderName: 'Green Thumb Co.',
     rating: 4.7,
-    location: 'Suburbs',
+    location: 'Miami, FL',
     condition: ToolCondition.GOOD,
     instantBooking: true,
     unavailableDates: ['2024-05-10', '2024-05-11', '2024-05-12']
@@ -128,7 +128,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Creative Carpenters',
     rating: 4.6,
-    location: 'Downtown',
+    location: 'New York, NY',
     condition: ToolCondition.GOOD,
     instantBooking: true
   },
@@ -144,7 +144,7 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Garden Pro',
     rating: 4.3,
-    location: 'Eastside',
+    location: 'Denver, CO',
     condition: ToolCondition.FAIR,
     instantBooking: true
   },
@@ -160,9 +160,39 @@ export const MOCK_TOOLS: Tool[] = [
     available: true,
     lenderName: 'Alex R.',
     rating: 4.8,
-    location: 'Downtown',
+    location: 'Chicago, IL',
     condition: ToolCondition.LIKE_NEW,
     instantBooking: false
+  },
+  {
+    id: '9',
+    name: 'Pressure Washer',
+    description: '3000 PSI Gas Pressure Washer. Great for driveways and siding.',
+    category: ToolCategory.OTHER,
+    pricePerDay: 45,
+    pricing: { hourly: 12, daily: 45 },
+    securityDeposit: 100,
+    image: 'https://picsum.photos/id/9/400/300',
+    available: true,
+    lenderName: 'Clean Team',
+    rating: 4.9,
+    location: 'Phoenix, AZ',
+    condition: ToolCondition.GOOD
+  },
+  {
+    id: '10',
+    name: 'Tile Saw',
+    description: '7-inch wet tile saw with stand. Precision cutting for ceramic and stone.',
+    category: ToolCategory.POWER_TOOLS,
+    pricePerDay: 35,
+    pricing: { hourly: 8, daily: 35 },
+    securityDeposit: 80,
+    image: 'https://picsum.photos/id/10/400/300',
+    available: true,
+    lenderName: 'Reno Pro',
+    rating: 4.6,
+    location: 'Atlanta, GA',
+    condition: ToolCondition.GOOD
   }
 ];
 
@@ -226,8 +256,207 @@ export const MOCK_USER: User = {
   },
   loyaltyPoints: 1250,
   referralCode: 'ALEXR2024',
-  tier: 'Silver'
+  tier: 'Silver',
+  role: 'User',
+  status: 'Active'
 };
+
+// Added User1-4 and Admin1-4
+export const MOCK_ALL_USERS: User[] = [
+  MOCK_USER,
+  {
+    id: 'u2',
+    name: 'Sarah Jenkins',
+    email: 'sarah.j@example.com',
+    phone: '555-0101',
+    role: 'User',
+    status: 'Active',
+    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+    bio: 'Avid gardener.',
+    joinDate: '2023-09-10',
+    location: 'Seattle, WA',
+    verified: true,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: false },
+    stats: { rentalsCount: 8, listingsCount: 2, avgRating: 4.8 },
+    badges: [],
+    loyaltyPoints: 200,
+    referralCode: 'SARAHJ',
+    tier: 'Bronze'
+  },
+  {
+    id: 'u3',
+    name: 'Mike Thompson',
+    email: 'mike.t@example.com',
+    phone: '555-0102',
+    role: 'User',
+    status: 'Suspended',
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+    bio: 'Carpenter.',
+    joinDate: '2023-11-05',
+    location: 'Austin, TX',
+    verified: false,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: false },
+    stats: { rentalsCount: 3, listingsCount: 1, avgRating: 3.5 },
+    badges: [],
+    loyaltyPoints: 50,
+    referralCode: 'MIKET',
+    tier: 'Bronze'
+  },
+  // New Users
+  {
+    id: 'user1',
+    name: 'User One',
+    email: 'user1@toolshare.com',
+    phone: '555-0103',
+    role: 'User',
+    status: 'Active',
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    bio: 'New user.',
+    joinDate: '2024-01-01',
+    location: 'New York, NY',
+    verified: false,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: false },
+    stats: { rentalsCount: 0, listingsCount: 0, avgRating: 0 },
+    badges: [],
+    loyaltyPoints: 0,
+    referralCode: 'USER1',
+    tier: 'Bronze'
+  },
+  {
+    id: 'user2',
+    name: 'User Two',
+    email: 'user2@toolshare.com',
+    phone: '555-0104',
+    role: 'User',
+    status: 'Active',
+    avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+    bio: 'Builder.',
+    joinDate: '2024-01-02',
+    location: 'Chicago, IL',
+    verified: true,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: false },
+    stats: { rentalsCount: 5, listingsCount: 0, avgRating: 5.0 },
+    badges: ['Identity Verified'],
+    loyaltyPoints: 100,
+    referralCode: 'USER2',
+    tier: 'Bronze'
+  },
+  {
+    id: 'user3',
+    name: 'User Three',
+    email: 'user3@toolshare.com',
+    phone: '555-0105',
+    role: 'User',
+    status: 'Active',
+    avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+    bio: 'Fixer.',
+    joinDate: '2024-01-03',
+    location: 'Los Angeles, CA',
+    verified: false,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: false },
+    stats: { rentalsCount: 1, listingsCount: 0, avgRating: 4.0 },
+    badges: [],
+    loyaltyPoints: 20,
+    referralCode: 'USER3',
+    tier: 'Bronze'
+  },
+  {
+    id: 'user4',
+    name: 'User Four',
+    email: 'user4@toolshare.com',
+    phone: '555-0106',
+    role: 'User',
+    status: 'Active',
+    avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
+    bio: 'Pro.',
+    joinDate: '2024-01-04',
+    location: 'Houston, TX',
+    verified: true,
+    privacy: { publicProfile: true, showExactLocation: false, allowMessages: true, twoFactorEnabled: true },
+    stats: { rentalsCount: 10, listingsCount: 3, avgRating: 4.9 },
+    badges: ['Top Lender'],
+    loyaltyPoints: 600,
+    referralCode: 'USER4',
+    tier: 'Silver'
+  },
+  // Admins
+  {
+    id: 'admin1',
+    name: 'Admin One',
+    email: 'admin1@toolshare.com',
+    phone: '555-0001',
+    role: 'Admin',
+    status: 'Active',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+One&background=0D8ABC&color=fff',
+    bio: 'System Admin',
+    joinDate: '2023-01-01',
+    location: 'Headquarters',
+    verified: true,
+    privacy: { publicProfile: false, showExactLocation: false, allowMessages: false, twoFactorEnabled: true },
+    stats: { rentalsCount: 0, listingsCount: 0, avgRating: 0 },
+    badges: ['Staff'],
+    loyaltyPoints: 0,
+    referralCode: 'ADMIN',
+    tier: 'Platinum'
+  },
+  {
+    id: 'admin2',
+    name: 'Admin Two',
+    email: 'admin2@toolshare.com',
+    phone: '555-0002',
+    role: 'Admin',
+    status: 'Active',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Two&background=0D8ABC&color=fff',
+    bio: 'Support Lead',
+    joinDate: '2023-01-01',
+    location: 'Headquarters',
+    verified: true,
+    privacy: { publicProfile: false, showExactLocation: false, allowMessages: false, twoFactorEnabled: true },
+    stats: { rentalsCount: 0, listingsCount: 0, avgRating: 0 },
+    badges: ['Staff'],
+    loyaltyPoints: 0,
+    referralCode: 'ADMIN',
+    tier: 'Platinum'
+  },
+  {
+    id: 'admin3',
+    name: 'Admin Three',
+    email: 'admin3@toolshare.com',
+    phone: '555-0003',
+    role: 'Admin',
+    status: 'Active',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Three&background=0D8ABC&color=fff',
+    bio: 'Moderator',
+    joinDate: '2023-01-01',
+    location: 'Headquarters',
+    verified: true,
+    privacy: { publicProfile: false, showExactLocation: false, allowMessages: false, twoFactorEnabled: true },
+    stats: { rentalsCount: 0, listingsCount: 0, avgRating: 0 },
+    badges: ['Staff'],
+    loyaltyPoints: 0,
+    referralCode: 'ADMIN',
+    tier: 'Platinum'
+  },
+  {
+    id: 'admin4',
+    name: 'Admin Four',
+    email: 'admin4@toolshare.com',
+    phone: '555-0004',
+    role: 'Admin',
+    status: 'Active',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Four&background=0D8ABC&color=fff',
+    bio: 'Manager',
+    joinDate: '2023-01-01',
+    location: 'Headquarters',
+    verified: true,
+    privacy: { publicProfile: false, showExactLocation: false, allowMessages: false, twoFactorEnabled: true },
+    stats: { rentalsCount: 0, listingsCount: 0, avgRating: 0 },
+    badges: ['Staff'],
+    loyaltyPoints: 0,
+    referralCode: 'ADMIN',
+    tier: 'Platinum'
+  },
+];
 
 export const MOCK_ACTIVITY_LOG: ActivityLog[] = [
   {
@@ -377,6 +606,19 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
        { id: 'm5', senderId: 'u3', text: 'Hey, interested in the ladder.', timestamp: Date.now() - 1000 * 60 * 60 * 25, type: 'text' },
        { id: 'm6', senderId: 'u3', text: 'Can you send a photo of the condition?', timestamp: Date.now() - 1000 * 60 * 60 * 24, type: 'text' }
     ]
+  },
+  {
+    id: 'c3',
+    participantId: 'user1',
+    participantName: 'User One',
+    participantAvatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    isOnline: true,
+    lastMessage: 'Is this tool available?',
+    lastMessageTimestamp: Date.now() - 1000 * 60 * 60 * 48,
+    unreadCount: 0,
+    messages: [
+       { id: 'm7', senderId: 'user1', text: 'Hi, is this still available?', timestamp: Date.now() - 1000 * 60 * 60 * 48, type: 'text' }
+    ]
   }
 ];
 
@@ -436,9 +678,14 @@ export const MOCK_FORUM_THREADS: ForumThread[] = [
     title: 'Best sander for refinishing hardwood floors?',
     author: 'WoodWorker88',
     category: 'Recommendations',
-    replies: 12,
+    replies: 2,
     views: 145,
-    lastActive: '2 hours ago'
+    lastActive: '2 hours ago',
+    content: "I'm looking to refinish about 500sqft of oak flooring. Should I rent a drum sander or just use a large orbital? Any brand recommendations for rentals?",
+    replyList: [
+      { id: 'tr1', threadId: 't1', author: 'FlooringPro', avatar: 'https://ui-avatars.com/api/?name=Flooring+Pro', content: 'Definitely go with a drum sander for the main areas, but be careful not to gouge it. Use an edger for the sides.', timestamp: Date.now() - 10000000 },
+      { id: 'tr2', threadId: 't1', author: 'DIY_Dave', avatar: 'https://ui-avatars.com/api/?name=DIY+Dave', content: 'I used an orbital from Home Depot and it took FOREVER. Listen to the pro above.', timestamp: Date.now() - 5000000 }
+    ]
   },
   {
     id: 't2',
@@ -447,7 +694,9 @@ export const MOCK_FORUM_THREADS: ForumThread[] = [
     category: 'Meetups',
     replies: 45,
     views: 890,
-    lastActive: '10 mins ago'
+    lastActive: '10 mins ago',
+    content: 'Join us for our monthly community meetup! We will be demoing safe table saw techniques and hosting a tool swap.',
+    replyList: []
   },
   {
     id: 't3',
@@ -456,7 +705,9 @@ export const MOCK_FORUM_THREADS: ForumThread[] = [
     category: 'Projects',
     replies: 8,
     views: 200,
-    lastActive: '1 day ago'
+    lastActive: '1 day ago',
+    content: 'Just finished framing the new deck. Check out these pics! Used a rented impact driver from here and it made a huge difference.',
+    replyList: []
   }
 ];
 
@@ -527,4 +778,72 @@ export const MOCK_LOYALTY_TIERS: LoyaltyTier[] = [
   { name: 'Silver', minPoints: 500, benefits: ['5% discount on rentals', 'Early access to new tools'], color: 'text-gray-400' },
   { name: 'Gold', minPoints: 1000, benefits: ['10% discount', 'Priority support', '$0 security deposits'], color: 'text-yellow-500' },
   { name: 'Platinum', minPoints: 2500, benefits: ['15% discount', 'Concierge service', 'Exclusive events'], color: 'text-purple-400' }
+];
+
+export const COLOR_THEMES: ColorTheme[] = [
+  {
+    id: 'sky',
+    name: 'Sky',
+    colors: { 50: '240 249 255', 100: '224 242 254', 500: '14 165 233', 600: '2 132 199', 900: '12 74 110' }
+  },
+  {
+    id: 'blue',
+    name: 'Blue',
+    colors: { 50: '239 246 255', 100: '219 234 254', 500: '59 130 246', 600: '37 99 235', 900: '30 58 138' }
+  },
+  {
+    id: 'indigo',
+    name: 'Indigo',
+    colors: { 50: '238 242 255', 100: '224 231 255', 500: '99 102 241', 600: '79 70 229', 900: '49 46 129' }
+  },
+  {
+    id: 'violet',
+    name: 'Violet',
+    colors: { 50: '245 243 255', 100: '237 233 254', 500: '139 92 246', 600: '124 58 237', 900: '76 29 149' }
+  },
+  {
+    id: 'purple',
+    name: 'Purple',
+    colors: { 50: '250 245 255', 100: '243 232 255', 500: '168 85 247', 600: '147 51 234', 900: '88 28 135' }
+  },
+  {
+    id: 'fuchsia',
+    name: 'Fuchsia',
+    colors: { 50: '253 244 255', 100: '250 232 255', 500: '217 70 239', 600: '192 38 211', 900: '112 26 117' }
+  },
+  {
+    id: 'pink',
+    name: 'Pink',
+    colors: { 50: '253 242 248', 100: '252 231 243', 500: '236 72 153', 600: '219 39 119', 900: '131 24 67' }
+  },
+  {
+    id: 'rose',
+    name: 'Rose',
+    colors: { 50: '255 241 242', 100: '255 228 230', 500: '244 63 94', 600: '225 29 72', 900: '136 19 55' }
+  },
+  {
+    id: 'red',
+    name: 'Red',
+    colors: { 50: '254 242 242', 100: '254 226 226', 500: '239 68 68', 600: '220 38 38', 900: '127 29 29' }
+  },
+  {
+    id: 'orange',
+    name: 'Orange',
+    colors: { 50: '255 247 237', 100: '255 237 213', 500: '249 115 22', 600: '234 88 12', 900: '124 45 18' }
+  },
+  {
+    id: 'amber',
+    name: 'Amber',
+    colors: { 50: '255 251 235', 100: '254 243 199', 500: '245 158 11', 600: '217 119 6', 900: '120 53 15' }
+  },
+  {
+    id: 'green',
+    name: 'Green',
+    colors: { 50: '240 253 244', 100: '220 252 231', 500: '34 197 94', 600: '22 163 74', 900: '20 83 45' }
+  },
+  {
+    id: 'teal',
+    name: 'Teal',
+    colors: { 50: '240 253 250', 100: '204 251 241', 500: '20 184 166', 600: '13 148 136', 900: '19 78 74' }
+  }
 ];
